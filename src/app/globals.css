@@ -2,6 +2,41 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background: #fdfaf6;
+    color: #1f1a16;
+    font-family: var(--font-sans), system-ui, -apple-system, "Segoe UI",
+      Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+@layer utilities {
+  .bg-warm {
+    background:
+      radial-gradient(1200px 600px at 50% -10%, #ffe6c9 0%, transparent 60%),
+      radial-gradient(800px 400px at 100% 110%, #ffd1c1 0%, transparent 55%),
+      #fdfaf6;
+  }
+
+  .text-gradient-brand {
+    background: linear-gradient(90deg, #e05008 0%, #f96a12 50%, #e11d48 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
 }
