@@ -1,6 +1,7 @@
 import { supabase } from "@/lib/supabase";
 import type { Shop, Service } from "@/lib/types";
 import { notFound } from "next/navigation";
+import Link from "next/link";
 
 export default async function ShopBookingPage({
   params,
@@ -29,7 +30,6 @@ export default async function ShopBookingPage({
 
   return (
     <main className="min-h-screen p-4 max-w-lg mx-auto pb-24">
-      {/* Shop header */}
       <header className="pt-6 pb-4">
         <h1 className="text-2xl font-bold text-gray-900">{shop.name}</h1>
         {shop.address && (
@@ -40,7 +40,6 @@ export default async function ShopBookingPage({
         )}
       </header>
 
-      {/* Services */}
       <section className="mt-4">
         <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-3">
           Choose a service
@@ -53,9 +52,10 @@ export default async function ShopBookingPage({
         ) : (
           <div className="space-y-2">
             {(services as Service[]).map((service) => (
-              <div
+              <Link
                 key={service.id}
-                className="bg-white rounded-xl border p-4 flex items-center justify-between"
+                href={`/b/${slug}/book?service=${service.id}`}
+                className="block bg-white rounded-xl border p-4 flex items-center justify-between active:bg-gray-50 transition"
               >
                 <div>
                   <div className="font-medium text-gray-900">
@@ -68,14 +68,14 @@ export default async function ShopBookingPage({
                 <div className="font-semibold text-gray-900">
                   ₹{service.price}
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         )}
       </section>
 
       <p className="text-center text-xs text-gray-400 mt-8">
-        Booking flow coming next.
+        Tap a service to continue.
       </p>
     </main>
   );
