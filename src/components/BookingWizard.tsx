@@ -10,8 +10,8 @@ type Props = {
   service: Service;
 };
 
-function nextNDates(n: number): { iso: string; label: string }[] {
-  const out: { iso: string; label: string }[] = [];
+function nextNDates(n: number): { iso: string; label: string; sub: string }[] {
+  const out: { iso: string; label: string; sub: string }[] = [];
   const now = new Date();
   for (let i = 0; i < n; i++) {
     const d = new Date(now);
@@ -25,12 +25,12 @@ function nextNDates(n: number): { iso: string; label: string }[] {
         ? "Today"
         : i === 1
         ? "Tomorrow"
-        : d.toLocaleDateString("en-IN", {
-            weekday: "short",
-            day: "numeric",
-            month: "short",
-          });
-    out.push({ iso, label });
+        : d.toLocaleDateString("en-IN", { weekday: "short" });
+    const sub =
+      i < 2
+        ? d.toLocaleDateString("en-IN", { day: "numeric", month: "short" })
+        : d.toLocaleDateString("en-IN", { day: "numeric", month: "short" });
+    out.push({ iso, label, sub });
   }
   return out;
 }
@@ -130,101 +130,143 @@ export default function BookingWizard({ shop, service }: Props) {
 
   return (
     <div className="space-y-6">
-      {/* Selected service summary */}
-      <div className="bg-white rounded-xl border p-4">
-        <div className="text-xs text-gray-500 uppercase tracking-wide">
-          Service
+      {/* Service summary */}
+      <div className="bg-white rounded-3xl border border-orange-100/70 shadow-card p-4 flex items-center gap-4">
+        <div className="w-11 h-11 rounded-2xl bg-brand-50 text-2xl flex items-center justify-center shrink-0">
+          {service.name.toLowerCase().includes("beard") ? "🪒" : "✂️"}
         </div>
-        <div className="font-medium text-gray-900 mt-0.5">
-          {service.name} · ₹{service.price} · {service.duration_minutes} min
+        <div className="flex-1">
+          <div className="text-[11px] text-gray-500 uppercase tracking-widest">
+            Service
+          </div>
+          <div className="font-semibold text-gray-900">{service.name}</div>
+          <div className="text-xs text-gray-500 mt-0.5">
+            {service.duration_minutes} min
+          </div>
         </div>
+        <div className="font-bold text-gray-900">₹{service.price}</div>
       </div>
 
       {/* Date picker */}
       <section>
-        <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-3">
+        <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-3">
           Pick a date
         </h2>
-        <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4">
-          {dates.map((d) => (
-            <button
-              key={d.iso}
-              type="button"
-              onClick={() => setSelectedDate(d.iso)}
-              className={`flex-shrink-0 px-4 py-2 rounded-xl border text-sm font-medium transition ${
-                selectedDate === d.iso
-                  ? "bg-black text-white border-black"
-                  : "bg-white text-gray-700 border-gray-200"
-              }`}
-            >
-              {d.label}
-            </button>
-          ))}
+        <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1 -mx-5 px-5">
+          {dates.map((d) => {
+            const active = selectedDate === d.iso;
+            return (
+              <button
+                key={d.iso}
+                type="button"
+                onClick={() => setSelectedDate(d.iso)}
+                className={`flex-shrink-0 min-w-[76px] py-3 px-3 rounded-2xl border text-center transition ${
+                  active
+                    ? "bg-brand-600 border-brand-600 text-white shadow-soft"
+                    : "bg-white border-orange-100/70 text-gray-700 hover:border-brand-200"
+                }`}
+              >
+                <div className="text-sm font-semibold">{d.label}</div>
+                <div
+                  className={`text-[11px] mt-0.5 ${
+                    active ? "text-white/80" : "text-gray-400"
+                  }`}
+                >
+                  {d.sub}
+                </div>
+              </button>
+            );
+          })}
         </div>
       </section>
 
       {/* Slot picker */}
       <section>
-        <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-3">
+        <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-3">
           Pick a time
         </h2>
 
         {loadingSlots ? (
-          <div className="bg-white rounded-xl border p-6 text-center text-gray-500 text-sm">
-            Loading times…
+          <div className="bg-white rounded-3xl border border-orange-100/70 p-6 text-center text-gray-400 text-sm shadow-card">
+            Finding open slots…
           </div>
         ) : slots.length === 0 ? (
-          <div className="bg-white rounded-xl border p-6 text-center text-gray-500 text-sm">
-            No slots available on this day. Try another date.
+          <div className="bg-white rounded-3xl border border-orange-100/70 p-6 text-center text-gray-500 text-sm shadow-card">
+            No slots available on this day.
+            <br />
+            Try another date.
           </div>
         ) : (
           <div className="grid grid-cols-3 gap-2">
-            {slots.map((s) => (
-              <button
-                key={s}
-                type="button"
-                onClick={() => setSelectedSlot(s)}
-                className={`py-3 rounded-xl border text-sm font-medium transition ${
-                  selectedSlot === s
-                    ? "bg-black text-white border-black"
-                    : "bg-white text-gray-800 border-gray-200 active:bg-gray-50"
-                }`}
-              >
-                {s}
-              </button>
-            ))}
+            {slots.map((s) => {
+              const active = selectedSlot === s;
+              return (
+                <button
+                  key={s}
+                  type="button"
+                  onClick={() => setSelectedSlot(s)}
+                  className={`py-3 rounded-2xl border text-sm font-semibold transition ${
+                    active
+                      ? "bg-brand-600 border-brand-600 text-white shadow-soft"
+                      : "bg-white text-gray-800 border-orange-100/70 hover:border-brand-200 active:scale-[0.98]"
+                  }`}
+                >
+                  {s}
+                </button>
+              );
+            })}
           </div>
         )}
       </section>
 
       {/* Contact form */}
       {selectedSlot && (
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
-            Your details
-          </h2>
+        <form
+          onSubmit={handleSubmit}
+          className="bg-white rounded-3xl border border-orange-100/70 shadow-card p-5 space-y-4"
+        >
+          <div>
+            <div className="text-[11px] text-gray-500 uppercase tracking-widest">
+              Your slot
+            </div>
+            <div className="font-semibold text-gray-900 text-lg">
+              {selectedSlot}
+            </div>
+          </div>
 
-          <input
-            type="text"
-            placeholder="Your name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none focus:border-black"
-            autoComplete="name"
-          />
+          <div>
+            <label className="text-xs font-medium text-gray-600 block mb-1.5">
+              Your name
+            </label>
+            <input
+              type="text"
+              placeholder="e.g. Ravi Kumar"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100 transition"
+              autoComplete="name"
+            />
+          </div>
 
-          <input
-            type="tel"
-            inputMode="numeric"
-            placeholder="10-digit mobile number"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))}
-            className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none focus:border-black"
-            autoComplete="tel"
-          />
+          <div>
+            <label className="text-xs font-medium text-gray-600 block mb-1.5">
+              Mobile number
+            </label>
+            <input
+              type="tel"
+              inputMode="numeric"
+              placeholder="10-digit mobile"
+              value={phone}
+              onChange={(e) =>
+                setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))
+              }
+              className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100 transition"
+              autoComplete="tel"
+            />
+          </div>
 
           {error && (
-            <p className="text-sm text-red-600 bg-red-50 rounded-xl px-4 py-3">
+            <p className="text-sm text-red-600 bg-red-50 rounded-2xl px-4 py-3">
               {error}
             </p>
           )}
@@ -232,10 +274,14 @@ export default function BookingWizard({ shop, service }: Props) {
           <button
             type="submit"
             disabled={submitting}
-            className="w-full bg-black text-white py-3 px-6 rounded-xl font-medium disabled:opacity-50"
+            className="w-full bg-brand-600 hover:bg-brand-700 active:scale-[0.99] text-white py-4 px-6 rounded-2xl font-semibold shadow-soft disabled:opacity-50 transition"
           >
-            {submitting ? "Booking…" : "Confirm booking"}
+            {submitting ? "Booking…" : `Confirm booking · ₹${service.price}`}
           </button>
+
+          <p className="text-[11px] text-center text-gray-400">
+            You'll get a confirmation with your slot details.
+          </p>
         </form>
       )}
     </div>
