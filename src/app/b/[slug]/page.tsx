@@ -14,6 +14,9 @@ function serviceEmoji(name: string): string {
   return "💈";
 }
 
+const SHOP_HERO =
+  "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=1200&q=80";
+
 export default async function ShopBookingPage({
   params,
 }: {
@@ -38,45 +41,70 @@ export default async function ShopBookingPage({
     .order("price", { ascending: true });
 
   return (
-    <main className="min-h-screen px-5 max-w-lg mx-auto pb-16">
-      {/* Shop header card */}
-      <header className="pt-8 pb-6">
-        <div className="bg-white rounded-3xl border border-orange-100/70 shadow-card overflow-hidden">
-          <div className="h-20 bg-gradient-to-r from-brand-500 via-brand-600 to-rose-500 relative">
-            <div className="absolute -bottom-7 left-5 w-14 h-14 rounded-2xl bg-white shadow-soft flex items-center justify-center text-3xl">
-              💈
-            </div>
+    <main className="min-h-screen max-w-lg mx-auto pb-16">
+      {/* Hero banner */}
+      <header className="relative">
+        <div className="relative h-56 sm:h-64 overflow-hidden rounded-b-[2rem]">
+          <img
+            src={SHOP_HERO}
+            alt="Barber shop"
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/30 to-black/70" />
+
+          <div className="absolute top-4 left-4 right-4 flex items-center justify-between">
+            <Link
+              href="/"
+              className="rounded-full bg-white/20 backdrop-blur text-white text-xs font-medium px-3 py-1.5 border border-white/20"
+            >
+              ← Home
+            </Link>
+            <span className="rounded-full bg-green-500 text-white text-[11px] font-semibold px-2.5 py-1">
+              ● Open now
+            </span>
           </div>
-          <div className="pt-10 pb-5 px-5">
-            <h1 className="text-2xl font-bold text-gray-900">{shop.name}</h1>
+
+          <div className="absolute bottom-4 left-4 right-4 text-white">
+            <h1 className="text-2xl font-extrabold drop-shadow-sm">
+              {shop.name}
+            </h1>
             {shop.address && (
-              <p className="text-sm text-gray-500 mt-1">📍 {shop.address}</p>
+              <p className="text-xs text-white/85 mt-1">📍 {shop.address}</p>
             )}
-            {shop.phone && (
-              <p className="text-sm text-gray-500 mt-0.5">📞 {shop.phone}</p>
-            )}
-            <div className="mt-3 flex gap-2">
-              <span className="text-[11px] font-medium bg-brand-50 text-brand-700 px-2.5 py-1 rounded-full">
-                Open {shop.opening_time?.slice(0, 5)} –{" "}
-                {shop.closing_time?.slice(0, 5)}
-              </span>
-              <span className="text-[11px] font-medium bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full">
-                {shop.number_of_chairs}{" "}
-                {shop.number_of_chairs === 1 ? "chair" : "chairs"}
-              </span>
-            </div>
           </div>
         </div>
       </header>
 
+      {/* Info chips */}
+      <section className="px-5 -mt-5 relative z-10">
+        <div className="bg-white rounded-3xl border border-orange-100 shadow-card p-4 grid grid-cols-3 gap-2 text-center">
+          <div>
+            <div className="text-[11px] text-gray-500">Opens</div>
+            <div className="text-sm font-semibold">
+              {shop.opening_time?.slice(0, 5)}
+            </div>
+          </div>
+          <div className="border-x border-orange-100">
+            <div className="text-[11px] text-gray-500">Closes</div>
+            <div className="text-sm font-semibold">
+              {shop.closing_time?.slice(0, 5)}
+            </div>
+          </div>
+          <div>
+            <div className="text-[11px] text-gray-500">Chairs</div>
+            <div className="text-sm font-semibold">{shop.number_of_chairs}</div>
+          </div>
+        </div>
+      </section>
+
       {/* Services */}
-      <section>
+      <section className="px-5 mt-8">
         <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-3">
           Choose a service
         </h2>
 
         {(services ?? []).length === 0 ? (
-          <div className="bg-white rounded-3xl border border-orange-100/70 p-8 text-center text-gray-500 shadow-card">
+          <div className="bg-white rounded-3xl border border-orange-100 p-8 text-center text-gray-500 shadow-card">
             No services available yet.
           </div>
         ) : (
@@ -85,9 +113,9 @@ export default async function ShopBookingPage({
               <Link
                 key={service.id}
                 href={`/b/${slug}/book?service=${service.id}`}
-                className="group block bg-white rounded-3xl border border-orange-100/70 p-4 shadow-card hover:shadow-soft hover:border-brand-200 active:scale-[0.99] transition flex items-center gap-4"
+                className="group block bg-white rounded-3xl border border-orange-100 p-4 shadow-card hover:shadow-soft hover:border-brand-200 active:scale-[0.99] transition flex items-center gap-4"
               >
-                <div className="w-12 h-12 rounded-2xl bg-brand-50 text-2xl flex items-center justify-center shrink-0">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-brand-50 to-orange-100 text-2xl flex items-center justify-center shrink-0">
                   {serviceEmoji(service.name)}
                 </div>
                 <div className="flex-1">
@@ -95,7 +123,7 @@ export default async function ShopBookingPage({
                     {service.name}
                   </div>
                   <div className="text-xs text-gray-500 mt-0.5">
-                    {service.duration_minutes} min
+                    ⏱ {service.duration_minutes} min
                   </div>
                 </div>
                 <div className="text-right">
@@ -110,6 +138,24 @@ export default async function ShopBookingPage({
             ))}
           </div>
         )}
+      </section>
+
+      {/* Trust strip */}
+      <section className="px-5 mt-8">
+        <div className="bg-white/70 backdrop-blur rounded-3xl border border-orange-100 p-4 flex items-center justify-around text-center text-[11px] text-gray-600">
+          <div>
+            <div className="text-lg">⚡</div>
+            <div className="mt-1 font-medium">Instant booking</div>
+          </div>
+          <div>
+            <div className="text-lg">🛡️</div>
+            <div className="mt-1 font-medium">Free for you</div>
+          </div>
+          <div>
+            <div className="text-lg">💬</div>
+            <div className="mt-1 font-medium">WhatsApp confirm</div>
+          </div>
+        </div>
       </section>
 
       <p className="text-center text-xs text-gray-400 mt-8">
